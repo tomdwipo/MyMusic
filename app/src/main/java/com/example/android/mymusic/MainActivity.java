@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     private Button musicButton;
@@ -15,12 +16,25 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mediaPlayer = new MediaPlayer();
-        mediaPlayer.create(getApplicationContext(), R.raw.game_field);
+        mediaPlayer = mediaPlayer.create(getApplicationContext(), R.raw.maps);
+
+
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                int duration = mp.getDuration();
+                Toast.makeText(getApplicationContext(),"Duration: "+duration/1000,Toast.LENGTH_LONG).show();
+            }
+        });
+
         musicButton = (Button)findViewById(R.id.playMusic);
         musicButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+
                 if (mediaPlayer.isPlaying()){
+
                     pauseMusic();
                 }
                 else {
@@ -33,6 +47,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
   public void pauseMusic(){
+
+
+
       if (mediaPlayer !=null){
           mediaPlayer.pause();
           musicButton.setText("Start");
@@ -43,5 +60,16 @@ public class MainActivity extends AppCompatActivity {
             mediaPlayer.start();
             musicButton.setText("Pause");
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (mediaPlayer != null && mediaPlayer.isPlaying()){
+            mediaPlayer.stop();
+            mediaPlayer.release();
+            mediaPlayer = null;
+
+        }
+        super.onDestroy();
     }
 }
